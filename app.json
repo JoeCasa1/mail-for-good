@@ -10,7 +10,7 @@
       "size": "free"
     }
   },
-  "stack": "heroku-16",
+  "stack": "heroku-22",
   "env": {
     "HEROKU": {
       "value": "true"
