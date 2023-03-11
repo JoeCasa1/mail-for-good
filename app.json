@@ -22,9 +22,6 @@
   "addons": [
     {
       "plan": "heroku-postgresql:mini",
-      "options": {
-        "version": "9.6"
-      }
     },
     {
       "plan": "heroku-redis:mini"
