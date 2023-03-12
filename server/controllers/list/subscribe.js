@@ -1,7 +1,7 @@
-const ListSubscriber = require('../../models').listsubscriber;
-const List = require('../../models').list;
+import { listsubscriber as ListSubscriber } from '../../models';
+import { list as List } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
   const email = req.query.email;
   const subscribeKey = req.query.subscribeKey;
   const redirectOnSuccess = req.query.redirectOnSuccess;

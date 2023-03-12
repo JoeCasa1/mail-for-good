@@ -1,13 +1,13 @@
-const session = require('express-session');
+import session from 'express-session';
 const RedisStore = require('connect-redis')(session);
 
-const secret = require('../secrets');
+import { sessionSecret } from '../secrets';
 
-module.exports = client => {
+export default client => {
   // Session middleware
   const sessionMiddleware = session({
     store: new RedisStore({ client }),
-    secret: secret.sessionSecret,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false
   });

@@ -1,6 +1,6 @@
-const socketIo = require('socket.io');
+import socketIo from 'socket.io';
 
-module.exports = (sessionMiddleware, server) => {
+export default (sessionMiddleware, server) => {
   // Websocket notifications
   const getProfile = require('../../controllers/websockets/get-profile');
 

@@ -1,6 +1,6 @@
-const OfferPermission = require('../../models').offerPermission;
+import { offerPermission as OfferPermission } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   let { offerIds } = req.body; // List of ids in offerPermission to reject
   offerIds = typeof offerIds === 'object' ? offerIds : [offerIds];

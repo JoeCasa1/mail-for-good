@@ -1,6 +1,6 @@
-const ACL = require('../../models').acl;
+import { acl as ACL } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   ACL.findAll({
     where: {

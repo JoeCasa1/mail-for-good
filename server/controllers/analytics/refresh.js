@@ -1,12 +1,12 @@
-const AWS = require('aws-sdk');
-const CampaignSubscriber = require('../../models').campaignsubscriber;
-const CampaignAnalytics = require('../../models').campaignanalytics;
-const ListSubscriber = require('../../models').listsubscriber;
+import { SQS } from 'aws-sdk';
+import { campaignsubscriber as CampaignSubscriber } from '../../models';
+import { campaignanalytics as CampaignAnalytics } from '../../models';
+import { listsubscriber as ListSubscriber } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   // testing SQS delivery status stuff
-  let sqs = new AWS.SQS({
+  let sqs = new SQS({
     accessKeyId: process.env.AWS_ACCESS,
     secretAccessKey: process.env.AWS_SECRET,
     region: `eu-west-1`

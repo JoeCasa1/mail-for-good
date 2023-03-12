@@ -1,12 +1,12 @@
-const uaParser = require('ua-parser-js');
-const geoip = require('geoip-lite');
+import uaParser from 'ua-parser-js';
+import { lookup } from 'geoip-lite';
 
-const CampaignAnalyticsOpen = require('../../models').campaignanalyticsopen;
-const CampaignAnalytics = require('../../models').campaignanalytics;
+import { campaignanalyticsopen as CampaignAnalyticsOpen } from '../../models';
+import { campaignanalytics as CampaignAnalytics } from '../../models';
 
 const trackingPixel = new Buffer('R0lGODlhAQABAPAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw', 'base64');
 
-module.exports = function(req, res) {
+export default function(req, res) {
   CampaignAnalyticsOpen.findOne({
     where: {
       trackingId: req.query.trackingId,
@@ -25,7 +25,7 @@ module.exports = function(req, res) {
       foundCampaignAnalyticsOpen.ipAddress = ipAddress;
 
       // Attempt ip geolocation using MaxMind db
-      const geoLocation = geoip.lookup(ipAddress);
+      const geoLocation = lookup(ipAddress);
       if (geoLocation) {  // If the IP address was not found, the lookup returns null
         foundCampaignAnalyticsOpen.country = geoLocation.country;
         foundCampaignAnalyticsOpen.region = geoLocation.region;

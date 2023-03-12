@@ -1,12 +1,12 @@
-const _ = require('lodash');
-const Setting = require('../../models').setting;
-const configureAws = require('./configure-aws/configure-aws');
+import { pickBy, isEmpty, extend } from 'lodash';
+import { setting as Setting } from '../../models';
+import configureAws from './configure-aws/configure-aws';
 
-module.exports = function(req, res, redis) {
-  const settingsToChange = _.pickBy(req.body);
+export default function(req, res, redis) {
+  const settingsToChange = pickBy(req.body);
 
   // Exit if there are no settings to change
-  if (_.isEmpty(settingsToChange)) {
+  if (isEmpty(settingsToChange)) {
     res.status(400).send();
     return;
   }
@@ -57,7 +57,7 @@ module.exports = function(req, res, redis) {
       where: { userId: req.user.id },
       attributes: ['amazonSimpleEmailServiceAccessKey', 'amazonSimpleEmailServiceSecretKey', 'region', 'email', 'userId']
     }).then(settingInstance => {
-      const settings = _.extend(
+      const settings = extend(
         {
           amazonSimpleEmailServiceAccessKey: settingInstance.amazonSimpleEmailServiceAccessKey,
           amazonSimpleEmailServiceSecretKey: settingInstance.amazonSimpleEmailServiceSecretKey,

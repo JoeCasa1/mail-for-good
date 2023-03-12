@@ -1,6 +1,6 @@
-const listsubscriber = require('../../models').listsubscriber;
+import { listsubscriber } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
   const unsubscribeKey = req.params.unsubscribeKey;
 
   listsubscriber.update(

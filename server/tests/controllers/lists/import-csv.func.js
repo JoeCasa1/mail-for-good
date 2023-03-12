@@ -1,20 +1,15 @@
-const httpMocks = require('node-mocks-http');
-const test = require('tape');
-const path = require('path');
-const exec = require('child_process').exec;
+import { createRequest, createResponse } from 'node-mocks-http';
+import test from 'tape';
+import { resolve } from 'path';
+import { exec } from 'child_process';
 
-const importCsv = require('../../../controllers/list/import-csv');
+import importCsv from '../../../controllers/list/import-csv';
 
 // Constants defining key db fields
 const USER_ID = 1;
 const LIST_NAME = 'list';
 
-const {
-  sequelize,
-  user: User,
-  list: List,
-  listsubscriber: ListSubscriber
-} = require('../../../models');
+import { sequelize, user as User, list as List, listsubscriber as ListSubscriber } from '../../../models';
 
 // Make the directory test-csv-files should it not exist
 
@@ -27,7 +22,7 @@ exec(`mkdir ${__dirname + '/test-csv-files'}`);
 test('Import CSV function correctly parses a CSV with a single column "email" & valid email rows.', async function (t) {
   t.plan(3);
   const FILENAME = '10normalemails';
-  const PATH_TO_FILE = path.resolve(__dirname, `./test-csv-files/${FILENAME}`);
+  const PATH_TO_FILE = resolve(__dirname, `./test-csv-files/${FILENAME}`);
   const TEST_EMAIL_ARRAY = ['a@a.com', 'b@b.com', 'c@c.com'];
 
   // Write CSV files to ./test-csv-files/10normalemails
@@ -44,7 +39,7 @@ test('Import CSV function correctly parses a CSV with a single column "email" & 
     We will spy on this function and once called check the DB to validate if import-csv functioned correctly.
   */
   const stubSessionReload = func => func();
-  const req = httpMocks.createRequest({
+  const req = createRequest({
     method: 'POST',
     url: '/user/42',
     body: {
@@ -68,7 +63,7 @@ test('Import CSV function correctly parses a CSV with a single column "email" & 
       },
     }
   });
-  const res = httpMocks.createResponse({ eventEmitter: require('events').EventEmitter });
+  const res = createResponse({ eventEmitter: require('events').EventEmitter });
   const io = {
     sockets: {
       connected: {
@@ -100,7 +95,7 @@ test('Import CSV function correctly parses a CSV with a single column "email" & 
 test('Import CSV does not accept malformed CSVs with extra semicolons.', async function (t) {
   t.plan(1);
   const FILENAME = '10emailswithtoomanycommas';
-  const PATH_TO_FILE = path.resolve(__dirname, `./test-csv-files/${FILENAME}`);
+  const PATH_TO_FILE = resolve(__dirname, `./test-csv-files/${FILENAME}`);
   const TEST_EMAIL_ARRAY = ['a@a.com,,,', 'b@b.com,', 'c@c.com'];
 
   // Write CSV files to ./test-csv-files/10normalemails
@@ -116,7 +111,7 @@ test('Import CSV does not accept malformed CSVs with extra semicolons.', async f
     It is a function that first refreshes the request it is passed to ensure that the socket info it has is correct.
     We will spy on this function and once called check the DB to validate if import-csv functioned correctly.
   */
-  const req = httpMocks.createRequest({
+  const req = createRequest({
     method: 'POST',
     url: '/user/42',
     body: {
@@ -134,7 +129,7 @@ test('Import CSV does not accept malformed CSVs with extra semicolons.', async f
       id: USER_ID,
     },
   });
-  const res = httpMocks.createResponse({ eventEmitter: require('events').EventEmitter });
+  const res = createResponse({ eventEmitter: require('events').EventEmitter });
   const io = {};
 
   importCsv(req, res, io);

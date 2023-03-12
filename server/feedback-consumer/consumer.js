@@ -1,10 +1,9 @@
 require('dotenv').config();
 const debug = require('debug')('server:feedback-consumer:index');
-const redis = require('redis');
-const async = require('async');
+import { createClient } from 'redis';
+import { forever } from 'async';
 
-const feedbackConsumer = require('./feedback-consumer');
-const Campaign = require('../models').campaign;
+import { start, restart } from './feedback-consumer';
 
 let redisSettings = null;
 if(process.env.HEROKU){
@@ -14,23 +13,23 @@ if(process.env.HEROKU){
 }
 
 
-feedbackConsumer.start();
+start();
 
 console.log("Feedback consumer started: watching for feedback messages (bounces, complaints, etc) from SQS");
 
 // Restart the feedback consumers to apply new credentials when
 // new settings are received
-const subscriber = redis.createClient(redisSettings);
+const subscriber = createClient(redisSettings);
 subscriber.on('message', (channel, event) => {
   if (event == 'changed') {
     debug('Got a change-settings event, so restarting consumers to apply new credentials');
-    feedbackConsumer.restart();
+    restart();
   }
 });
 subscriber.subscribe('change-settings');
 
 const pollingRateMs = 10000;
-async.forever(next => {
-    feedbackConsumer.restart();
+forever(next => {
+    restart();
     setTimeout(next, pollingRateMs);
 });

@@ -1,17 +1,17 @@
-const passport = require('passport');
+import passport, { serializeUser, deserializeUser } from 'passport';
 
-const secrets = require('../secrets');
-const db = require('../../models');
-const Google = require('../passport/google');
-const local = require('../passport/local')
+import { google } from '../secrets';
+import { user as _user } from '../../models';
+import Google from '../passport/google';
+import local from '../passport/local';
 
-module.exports = () => {
-  passport.serializeUser(function(user, done) {
+export default () => {
+  serializeUser(function(user, done) {
     done(null, user.id);
   });
 
-  passport.deserializeUser(function(id, done) {
-    db.user.findById(id).then(user => {
+  deserializeUser(function(id, done) {
+    _user.findById(id).then(user => {
       done(null, user);
       return null;
     }).catch(err => {
@@ -23,7 +23,7 @@ module.exports = () => {
   /* AUTHENTICATION STRATEGIES */
   ///////////////////////////////
   if(typeof process.env.GOOGLE_CONSUMER_KEY !== 'undefined'){
-    Google(passport, secrets.google);
+    Google(passport, google);
   }
   local(passport)
 };

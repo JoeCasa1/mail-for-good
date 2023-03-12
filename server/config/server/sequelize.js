@@ -1,6 +1,6 @@
-const db = require('../../models');
+import db from '../../models';
 
-module.exports = () => {
+export default () => {
   const { sequelize } = db;
 
   sequelize.sync({force:false,hooks:true})

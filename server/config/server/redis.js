@@ -1,6 +1,6 @@
-const redis = require('redis');
+import { createClient } from 'redis';
 
-module.exports = () => {
+export default () => {
   const redisSettings = {
     host: process.env.REDIS_HOST || '127.0.0.1',
     port: process.env.REDIS_PORT,
@@ -26,9 +26,9 @@ function createRedisClient(settings, url) {
   let client;
 
   if(url){
-    client = redis.createClient(url);
+    client = createClient(url);
   }else{
-    client = redis.createClient(settings);
+    client = createClient(settings);
   }
 
   return client;

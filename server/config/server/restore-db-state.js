@@ -1,5 +1,5 @@
-const Campaign = require('../../models').campaign;
-const User = require('../../models').user;
+import { campaign as Campaign } from '../../models';
+import { user as User } from '../../models';
 
 
 /**
@@ -9,7 +9,7 @@ const User = require('../../models').user;
  * In this case, update the status to 'interrupted',
  * allowing the user to resume sending a campaign manually.
  */
-module.exports = () => {
+export default () => {
   // If there are no users then the database is
   // probably fresh + there is no need to
   // update anything

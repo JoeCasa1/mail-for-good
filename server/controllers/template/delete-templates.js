@@ -1,6 +1,6 @@
-const Template = require('../../models').template;
+import { template as Template } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   const userId = req.user.id;
   const templateIds = req.body.data;

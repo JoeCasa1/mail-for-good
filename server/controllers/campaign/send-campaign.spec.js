@@ -1,5 +1,5 @@
-const { expect } = require('chai');
-const rewire = require('rewire');
+import { expect } from 'chai';
+import rewire from 'rewire';
 
 const sendCampaign = rewire('./send-campaign');
 

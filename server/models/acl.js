@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var acl = sequelize.define('acl', {
     userId: DataTypes.STRING, // This is the userId who granted permissions
     fromUserEmail: DataTypes.STRING,

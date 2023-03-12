@@ -1,31 +1,31 @@
-const path = require('path');
-const bodyParser = require('body-parser');
-const auth = require('./auth');
-const parseJson = bodyParser.json();
+import { resolve } from 'path';
+import { json } from 'body-parser';
+import auth from './auth';
+const parseJson = json();
 
-const unsubscribe = require('../controllers/subscriber/unsubscribe');
+import unsubscribe from '../controllers/subscriber/unsubscribe';
 
 // Analytics
-const getClickthroughs = require('../controllers/analytics/get-clickthroughs');
-const refresh = require('../controllers/analytics/refresh');
-const open = require('../controllers/analytics/open');
-const clickthrough = require('../controllers/analytics/clickthrough');
+import getClickthroughs from '../controllers/analytics/get-clickthroughs';
+import refresh from '../controllers/analytics/refresh';
+import open from '../controllers/analytics/open';
+import clickthrough from '../controllers/analytics/clickthrough';
 
 // Settings
-const getSettings = require('../controllers/settings/get-settings');
-const changeSettings = require('../controllers/settings/changesettings');
+import getSettings from '../controllers/settings/get-settings';
+import changeSettings from '../controllers/settings/changesettings';
 
 // Middleware
-const { apiIsAuth, isAuth } = require('./middleware/auth');
+import { apiIsAuth, isAuth } from './middleware/auth';
 
 // Routes
-const lists = require('./lists');
-const templates = require('./templates');
-const campaigns = require('./campaigns');
-const accountsManagement = require('./accountsManagement')
-const permissions = require('./permissions');
+import lists from './lists';
+import templates from './templates';
+import campaigns from './campaigns';
+import accountsManagement from './accountsManagement';
+import permissions from './permissions';
 
-module.exports = (app, passport, io, redis) => {
+export default (app, passport, io, redis) => {
 
   ////////////////////
   /* AUTHENTICATION */
@@ -98,6 +98,6 @@ module.exports = (app, passport, io, redis) => {
   ////////////////////
 
   app.get('/*', isAuth, (req, res) => {
-    res.sendFile(path.resolve('dist/index.html'));
+    res.sendFile(resolve('dist/index.html'));
   });
 };

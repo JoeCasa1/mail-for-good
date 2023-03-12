@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   "development": {
     "username": process.env.PSQL_USERNAME,
     "password": process.env.PSQL_PASSWORD,

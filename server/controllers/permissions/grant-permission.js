@@ -1,8 +1,8 @@
-const OfferPermission = require('../../models').offerPermission;
-const ACL = require('../../models').acl;
-const User = require('../../models').user;
+import { offerPermission as OfferPermission } from '../../models';
+import { acl as ACL } from '../../models';
+import { user as User } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   const { email, campaigns, templates, lists } = req.body;
 

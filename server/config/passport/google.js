@@ -1,13 +1,13 @@
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const db = require('../../models');
+import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth';
+import { user, sequelize, setting } from '../../models';
 
-module.exports = (passport, secret) => {
+export default (passport, secret) => {
   passport.use(new GoogleStrategy({
     clientID: secret.consumerKey,
     clientSecret: secret.consumerSecret,
     callbackURL: secret.callbackURL,
   }, (token, tokenSecret, profile, done) => {
-    db.user.findOne({
+    user.findOne({
       where: {
         googleId: profile.id
       }
@@ -17,8 +17,8 @@ module.exports = (passport, secret) => {
       } else {
         let newUserCreated;
 
-        db.sequelize.transaction(t => {
-          return db.user.create({
+        sequelize.transaction(t => {
+          return user.create({
             googleId: profile.id,
             token: token,
             email: profile._json.emails[0].value,
@@ -27,7 +27,7 @@ module.exports = (passport, secret) => {
           }, { transaction: t })
             .then(newUser => {
               newUserCreated = newUser;
-              return db.setting.create({ userId: newUser.id }, { transaction: t });
+              return setting.create({ userId: newUser.id }, { transaction: t });
           });
         }).then(() => {
           done(null, newUserCreated);

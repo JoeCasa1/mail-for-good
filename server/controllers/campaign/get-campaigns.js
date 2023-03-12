@@ -1,7 +1,7 @@
-const Campaign = require('../../models').campaign;
-const CampaignAnalytics = require('../../models').campaignanalytics;
+import { campaign as Campaign } from '../../models';
+import { campaignanalytics as CampaignAnalytics } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   const userId = req.user.id;
 

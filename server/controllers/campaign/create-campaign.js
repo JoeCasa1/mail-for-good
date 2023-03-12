@@ -1,10 +1,10 @@
-const db = require('../../models');
-const slug = require('slug');
+import { list, campaign, campaignanalytics, listsubscriber, campaignsubscriber } from '../../models';
+import slug from 'slug';
 
-const sendSingleNotification = require('../websockets/send-single-notification');
+import sendSingleNotification from '../websockets/send-single-notification';
 
 
-module.exports = (req, res, io) => {
+export default (req, res, io) => {
   /*
         Outstanding issues:
         -- Validate other things? Validations can be added as promises to validationComplete and run concurrently
@@ -17,7 +17,7 @@ module.exports = (req, res, io) => {
   const valueFromValidation = {};
 
   // Validate that this list belongs to the user
-  const validateListBelongsToUser = db.list.findOne({
+  const validateListBelongsToUser = list.findOne({
     where: {
       name: req.body.listName, // Could use list ID here
       userId
@@ -41,7 +41,7 @@ module.exports = (req, res, io) => {
       const emailBodyType = req.body.emailBody;
 
       // Find or create the campaign
-      db.campaign.findOrCreate({
+      campaign.findOrCreate({
         where: {
           name: req.body.campaignName, // Campaign exists & belongs to user
           userId: req.user.id
@@ -64,14 +64,14 @@ module.exports = (req, res, io) => {
         if (instance[0].$options.isNewRecord) {
           const campaignId = instance[0].dataValues.id;
           let totalCampaignSubscribersProcessed = 0;
-          db.campaignanalytics.create({campaignId}).then(() => {
+          campaignanalytics.create({campaignId}).then(() => {
             // Iterate through blocks of 10k ListSubscribers and bulk create CampaignSubscribers.
             // Each time we write (bulk insert) 10k ListSubscribers, fetch the next 10k by recursively calling
             // createCampaignSubscribers - ensures that we don't run out of ram by loading too many ListSubscribers
             // at once.
             res.send({message: 'Campaign is being created - it will be ready to send soon.'}); // Should use notification/status rather than simple response
             function createCampaignSubscribers(offset = 0, limit = 10000) {
-              db.listsubscriber.findAll({
+              listsubscriber.findAll({
                 where: {
                   listId: valueFromValidation.listId
                 },
@@ -94,11 +94,11 @@ module.exports = (req, res, io) => {
                     listSubscriber.campaignId = campaignId;
                     return listSubscriber;
                   });
-                  db.campaignsubscriber.bulkCreate(listSubscribers).then(() => {
+                  campaignsubscriber.bulkCreate(listSubscribers).then(() => {
                     createCampaignSubscribers(offset + limit);
                   });
                 } else {
-                  db.campaign.update({
+                  campaign.update({
                     status: 'ready',
                     totalCampaignSubscribers: totalCampaignSubscribersProcessed
                   }, {

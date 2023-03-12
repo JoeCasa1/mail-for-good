@@ -1,6 +1,6 @@
-const OfferPermission = require('../../models').offerPermission;
+import { offerPermission as OfferPermission } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   OfferPermission.findAll({
     where: {

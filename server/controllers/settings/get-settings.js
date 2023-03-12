@@ -1,6 +1,6 @@
-const Setting = require('../../models').setting;
+import { setting as Setting } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   /*
     NOTE: This file returns boolean values to the client for fields that have values assigned.

@@ -1,9 +1,9 @@
-const db = require('../../models');
-const email = require('./email');
-const AWS = require('aws-sdk');
-const moment = require('moment');
+import { campaign, setting, listsubscriber, campaignsubscriber, user, campaignanalytics } from '../../models';
+import { amazon } from './email';
+import { SES } from 'aws-sdk';
+import moment from 'moment';
 
-module.exports = (req, res, io, redis) => {
+export default (req, res, io, redis) => {
 
   const userId = req.user.id;
 
@@ -51,7 +51,7 @@ module.exports = (req, res, io, redis) => {
       quotas
     };
 
-    yield email.amazon.controller(generator, redis, campaignAndListInfo, amazonAccountInfo, io, req);
+    yield amazon.controller(generator, redis, campaignAndListInfo, amazonAccountInfo, io, req);
 
     // 8. TODO: If there was an error, handle it here
 
@@ -62,7 +62,7 @@ module.exports = (req, res, io, redis) => {
 
   // Validate the campaign belongs to the user
   function campaignBelongsToUser(userId, campaignId) {
-    db.campaign.findOne({
+    campaign.findOne({
       where: {
         id: campaignId,
         userId: userId
@@ -124,7 +124,7 @@ module.exports = (req, res, io, redis) => {
   }
 
   function getAmazonKeysAndRegion(userId) {
-    db.setting.findOne({
+    setting.findOne({
       where: {
         userId: userId
       }
@@ -155,7 +155,7 @@ module.exports = (req, res, io, redis) => {
   }
 
   function getEmailQuotas(accessKey, secretKey, region) {
-    const ses = new AWS.SES({accessKeyId: accessKey, secretAccessKey: secretKey, region: region});
+    const ses = new SES({accessKeyId: accessKey, secretAccessKey: secretKey, region: region});
 
     ses.getSendQuota((err, data) => {
       if (err) { // Either access keys are wrong here or the request is being placed too quickly
@@ -178,21 +178,21 @@ module.exports = (req, res, io, redis) => {
     let totalListSubscribers,
       totalEmailsToSend;
 
-    db.listsubscriber.count({
+    listsubscriber.count({
       where: {
         listId,
         subscribed: true
       }
     }).then(total => {
       totalListSubscribers = total;
-      return db.listsubscriber.count({
+      return listsubscriber.count({
         where: {
           listId,
           subscribed: true
         },
         include: [
           {
-            model: db.campaignsubscriber,
+            model: campaignsubscriber,
             where: {
               campaignId,
               sent: false
@@ -216,7 +216,7 @@ module.exports = (req, res, io, redis) => {
   }
 
   function updateAnalytics(campaignId, userId, totalEmails) {
-    const findUserById = db.user.findById(userId)
+    const findUserById = user.findById(userId)
       .then(foundUser => {
         return foundUser.increment('sentEmailsCount', { by: totalEmails });
       })
@@ -227,7 +227,7 @@ module.exports = (req, res, io, redis) => {
 
     const findCampaignAnalytics = findUserById
       .then(() => {
-        return db.campaignanalytics.findOne({
+        return campaignanalytics.findOne({
           where: {
             campaignId
           }

@@ -1,24 +1,24 @@
-const bodyParser = require('body-parser');
-const parseJson = bodyParser.json();
+import { json } from 'body-parser';
+const parseJson = json();
 const cookieParser = require('cookie-parser')();
 
 // Template controllers
-const getTemplates = require('../controllers/template/get-templates');
-const createTemplate = require('../controllers/template/create-template');
-const deleteTemplates = require('../controllers/template/delete-templates');
+import getTemplates from '../controllers/template/get-templates';
+import createTemplate from '../controllers/template/create-template';
+import deleteTemplates from '../controllers/template/delete-templates';
 
 // Middleware
-const { apiIsAuth } = require('./middleware/auth');
-const { writeAccess, readAccess } = require('./middleware/acl');
+import { apiIsAuth } from './middleware/auth';
+import { writeAccess, readAccess } from './middleware/acl';
 
 // Permission
-const templatePermission = require('../controllers/permissions/acl-lib/acl-template-permissions');
+import templatePermission from '../controllers/permissions/acl-lib/acl-template-permissions';
 
 // Higher order functions decorating with the permission type
 const writeTemplateAccess = (req, res, next) => writeAccess(req, res, next, templatePermission);
 const readTemplateAccess = (req, res, next) => readAccess(req, res, next, templatePermission);
 
-module.exports = function(app) {
+export default function(app) {
   // Get a list of all templates
   app.get('/api/template', apiIsAuth, cookieParser, readTemplateAccess, (req, res) => {
     getTemplates(req, res);

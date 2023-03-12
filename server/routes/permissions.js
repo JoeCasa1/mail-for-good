@@ -1,25 +1,25 @@
-const bodyParser = require('body-parser');
-const parseJson = bodyParser.json();
+import { json } from 'body-parser';
+const parseJson = json();
 
 // Permissions controllers
-const getGrantedPermissions = require('../controllers/permissions/get-granted-permissions');
-const grantPermissions = require('../controllers/permissions/grant-permission');
-const deleteGrantedPermissions = require('../controllers/permissions/delete-granted-permissions');
+import getGrantedPermissions from '../controllers/permissions/get-granted-permissions';
+import grantPermissions from '../controllers/permissions/grant-permission';
+import deleteGrantedPermissions from '../controllers/permissions/delete-granted-permissions';
 
-const getActivePermissions = require('../controllers/permissions/get-active-permissions');
-const deleteActivePermissions = require('../controllers/permissions/delete-active-permissions');
+import getActivePermissions from '../controllers/permissions/get-active-permissions';
+import deleteActivePermissions from '../controllers/permissions/delete-active-permissions';
 
-const getReceivedPermissionOffers = require('../controllers/permissions/get-received-permission-offers');
-const acceptPermissionOffer = require('../controllers/permissions/accept-permission-offer');
-const rejectPermissionOffer = require('../controllers/permissions/reject-permission-offers');
+import getReceivedPermissionOffers from '../controllers/permissions/get-received-permission-offers';
+import acceptPermissionOffer from '../controllers/permissions/accept-permission-offer';
+import rejectPermissionOffer from '../controllers/permissions/reject-permission-offers';
 
-const getGrantOfferedPermissions = require('../controllers/permissions/get-grant-offered-permissions');
-const deleteGrantOfferedPermissions = require('../controllers/permissions/delete-grant-offered-permissions');
+import getGrantOfferedPermissions from '../controllers/permissions/get-grant-offered-permissions';
+import deleteGrantOfferedPermissions from '../controllers/permissions/delete-grant-offered-permissions';
 
 // Middleware
-const { apiIsAuth } = require('./middleware/auth');
+import { apiIsAuth } from './middleware/auth';
 
-module.exports = function(app) {
+export default function(app) {
   // Get granted permissions (i.e. permissions you have granted another user)
   app.get('/api/permissions', apiIsAuth, (req, res) => {
     getGrantedPermissions(req, res);

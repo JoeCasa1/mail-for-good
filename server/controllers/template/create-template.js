@@ -1,7 +1,7 @@
-const db = require('../../models');
-const slug = require('slug');
+import { template } from '../../models';
+import slug from 'slug';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   const userId = req.user.id;
 
@@ -13,7 +13,7 @@ module.exports = (req, res) => {
 
   const emailBodyType = req.body.emailBody;
 
-  db.template.findOrCreate({
+  template.findOrCreate({
     where: {
       name: req.body.templateName,
       userId: userId

@@ -1,11 +1,11 @@
-const Campaign = require('../../models').campaign;
-const CampaignAnalytics = require('../../models').campaignanalytics;
-const CampaignAnalyticsLink = require('../../models').campaignanalyticslink;
+import { campaign as Campaign } from '../../models';
+import { campaignanalytics as CampaignAnalytics } from '../../models';
+import { campaignanalyticslink as CampaignAnalyticsLink } from '../../models';
 
 // Temporary route for getting clickthrough data
 // Will later integrate this into subscriber/campaign/list routes
 // ~ at the moment it only gets CTR per campaign
-module.exports = function(req, res) {
+export default function(req, res) {
   const campaignId = req.query.campaignId;
   const userId = req.user.id;
 

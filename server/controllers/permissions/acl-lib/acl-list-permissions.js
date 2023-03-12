@@ -1,6 +1,6 @@
-const ACL = require('../../../models').acl;
+import { acl as ACL } from '../../../models';
 
-module.exports = function(id, userId) {
+export default function(id, userId) {
 
   /*
     Returns a promise containing the type of permission granted

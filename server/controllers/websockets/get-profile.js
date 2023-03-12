@@ -1,6 +1,6 @@
-const User = require('../../models').user;
+import { user as User } from '../../models';
 
-module.exports = function(id) {
+export default function(id) {
   return User.findOne({
     where: {
       id: id

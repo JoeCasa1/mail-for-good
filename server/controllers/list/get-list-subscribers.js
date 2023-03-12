@@ -1,7 +1,7 @@
-const list = require('../../models').list;
-const listsubscriber = require('../../models').listsubscriber;
+import { list } from '../../models';
+import { listsubscriber } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
   // Find all subscribers belonging to a list
   const listId = req.query.listId;
   const offset = req.query.offset;

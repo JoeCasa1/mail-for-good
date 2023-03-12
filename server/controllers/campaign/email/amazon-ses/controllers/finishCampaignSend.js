@@ -1,4 +1,4 @@
-const db = require('../../../../../models');
+import { campaign } from '../../../../../models';
 
 /**
  * @description Change the campaign status on finishing a campaign send
@@ -6,9 +6,9 @@ const db = require('../../../../../models');
  * @param {object} campaignInfo - Information about this campaign
  */
 
-module.exports = (cancelCampaignSend, campaignInfo) => {
+export default (cancelCampaignSend, campaignInfo) => {
   const status = cancelCampaignSend ? 'interrupted' : 'done';
-  db.campaign.update({
+  campaign.update({
     status
   }, {
     where: {

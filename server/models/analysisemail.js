@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var analysisemail = sequelize.define('analysisEmail', {
     sesMessageId: DataTypes.STRING,
     email: DataTypes.STRING

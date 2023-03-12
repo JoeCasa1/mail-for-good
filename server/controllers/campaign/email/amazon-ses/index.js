@@ -1,23 +1,23 @@
-const getArrayOfEmailIds = require('./controllers/getArrayOfEmailIds');
-const getAmazonEmailArray = require('./controllers/getAmazonEmailArray');
-const updateCampaignStatus = require('./controllers/updateCampaignStatus');
-const finishCampaignSend = require('./controllers/finishCampaignSend');
+import getArrayOfEmailIds from './controllers/getArrayOfEmailIds';
+import getAmazonEmailArray from './controllers/getAmazonEmailArray';
+import updateCampaignStatus from './controllers/updateCampaignStatus';
+import finishCampaignSend from './controllers/finishCampaignSend';
 
-const nestArray = require('./lib/nest-array');
+import nestArray from './lib/nest-array';
 
-const configSes = require('./config/configSes');
+import configSes from './config/configSes';
 
-const sendCampaignSuccessEmail = require('./utils/sendCampaignSuccessEmail');
+import sendCampaignSuccessEmail from './utils/sendCampaignSuccessEmail';
 
-const sendFinalNotification = require('./notifications/sendFinalNotification');
-const sendUpdateEmailsSentNotification = require('./notifications/sendUpdateEmailsSentNotification');
+import sendFinalNotification from './notifications/sendFinalNotification';
+import sendUpdateEmailsSentNotification from './notifications/sendUpdateEmailsSentNotification';
 
-const CreateQueue = require('./queue');
+import CreateQueue from './queue';
 /**
  * @description Starts the process of sending emails
  */
 
-module.exports = async function (generator, redis, campaignAndListInfo, amazonAccountInfo, io, req) {
+export default async function (generator, redis, campaignAndListInfo, amazonAccountInfo, io, req) {
   const {
     campaignInfo, // See object passed by send-campaign.js, contains info about the campaigns table
   } = campaignAndListInfo;

@@ -1,6 +1,6 @@
-const SubscriberModel = require('../../models').subscriber;
+import { subscriber as SubscriberModel } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
   const subscribers = req.body.subscribers;
   // const fields = req.body.fields; 
 

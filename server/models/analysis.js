@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var analysis = sequelize.define('analysis', {
     name: DataTypes.STRING
   }, {

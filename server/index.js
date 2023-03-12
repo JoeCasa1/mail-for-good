@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const configureServer = require('./config/server');
+import configureServer from './config/server';
 
 // Use bluebird over native promises.
 global.Promise=require('bluebird');

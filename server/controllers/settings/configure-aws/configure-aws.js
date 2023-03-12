@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk');
-const async = require('async');
+import { config as _config, SNS, SQS, SES } from 'aws-sdk';
+import { waterfall, apply, parallel } from 'async';
 
 /**
  * Configure an AWS account for receiving SES feedback notifications (bounces and complaints) through an SNS queue.
@@ -13,11 +13,11 @@ const async = require('async');
  * @param credentials
  * @param callback - Called on success or error, i.e. callback(error, queueUrl)
  */
-module.exports = (credentials, callback) => {
-  AWS.config.update({accessKeyId: credentials.accessKey, secretAccessKey: credentials.secretKey, region: credentials.region});
+export default (credentials, callback) => {
+  _config.update({accessKeyId: credentials.accessKey, secretAccessKey: credentials.secretKey, region: credentials.region});
 
-  async.waterfall([
-    async.apply(createSnsTopics, { ses: { email: credentials.email }, sqs: { url: '', arn: '' }, sns: { bounce: { arn: '' }, complaint: { arn: '' } } }),
+  waterfall([
+    apply(createSnsTopics, { ses: { email: credentials.email }, sqs: { url: '', arn: '' }, sns: { bounce: { arn: '' }, complaint: { arn: '' } } }),
     createSqsQueue,
     subscribeSnsToSqs,
     subscribeSesToSns
@@ -37,7 +37,7 @@ function createSnsTopics (config = { sns: { bounce: { arn: '' }, complaint: { ar
 
   const create = (name, callback) => {
     // If this queue already exists, it just returns the ARN
-    const sns = new AWS.SNS();
+    const sns = new SNS();
     console.log(`Creating SNS topic: ${name}`);
 
     sns.createTopic({
@@ -51,9 +51,9 @@ function createSnsTopics (config = { sns: { bounce: { arn: '' }, complaint: { ar
     });
   };
 
-  async.parallel({
-    bounce: async.apply(create, SNS_BOUNCE_NAME),
-    complaint: async.apply(create, SNS_COMPLAINT_NAME)
+  parallel({
+    bounce: apply(create, SNS_BOUNCE_NAME),
+    complaint: apply(create, SNS_COMPLAINT_NAME)
   }, (err, result) => {
     if (err) {
       callback(err);
@@ -69,7 +69,7 @@ function createSnsTopics (config = { sns: { bounce: { arn: '' }, complaint: { ar
 function createSqsQueue (config = { sqs: { url: '', arn: '' } }, callback) {
   console.log("Creating SQS queue");
   const SQS_NAME = 'mail-for-good-ses-feedback';
-  const sqs = new AWS.SQS();
+  const sqs = new SQS();
 
   // Configure the SQS permissions so that it can receive
   // messages from SNS. This is a bit fiddly because we have to
@@ -126,8 +126,8 @@ function createSqsQueue (config = { sqs: { url: '', arn: '' } }, callback) {
 
 function subscribeSnsToSqs (config, callback) {
   console.log("Subscribing topics to queue");
-  const sqs = new AWS.SQS();
-  const sns = new AWS.SNS();
+  const sqs = new SQS();
+  const sns = new SNS();
 
   const subscribe = (topic, callback) => {
     sns.subscribe({
@@ -137,16 +137,16 @@ function subscribeSnsToSqs (config, callback) {
     }, callback);
   };
 
-  async.parallel({
-    bounce: async.apply(subscribe, config.sns.bounce.arn),
-    complaint: async.apply(subscribe, config.sns.complaint.arn)
+  parallel({
+    bounce: apply(subscribe, config.sns.bounce.arn),
+    complaint: apply(subscribe, config.sns.complaint.arn)
   }, () => {
     callback(null, config);
   });
 }
 
 function subscribeSesToSns (config, callback) {
-  const ses = new AWS.SES();
+  const ses = new SES();
 
   ses.listIdentities({
     IdentityType: 'EmailAddress',
@@ -159,7 +159,7 @@ function subscribeSesToSns (config, callback) {
       if (!identities.includes(config.ses.email)) {
         callback(new Error('SES email address was not found - have you created and verified this email in the SES settings page in the AWS console?'));
       } else {
-        async.parallel({
+        parallel({
           bounce: callback => ses.setIdentityNotificationTopic({
             Identity: identities[0],
             NotificationType: 'Bounce',

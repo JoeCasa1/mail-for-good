@@ -1,15 +1,15 @@
-const uaParser = require('ua-parser-js');
-const geoip = require('geoip-lite');
+import uaParser from 'ua-parser-js';
+import { lookup } from 'geoip-lite';
 
-const CampaignAnalyticsLink = require('../../models').campaignanalyticslink;
-const CampaignAnalytics = require('../../models').campaignanalytics;
+import { campaignanalyticslink as CampaignAnalyticsLink } from '../../models';
+import { campaignanalytics as CampaignAnalytics } from '../../models';
 
 console.log("Clickthrough tracking: Make sure that geoip data has been downloaded: ")
 console.log("   $ cd node_modules/geoip-lite")
 console.log("   $ npm run-script updatedb")
 
 
-module.exports = function(req, res) {
+export default function(req, res) {
   CampaignAnalyticsLink.findOne({
     where: {
       trackingId: req.query.trackingId,
@@ -28,7 +28,7 @@ module.exports = function(req, res) {
       foundCampaignAnalyticsLink.ipAddress = ipAddress;
 
       // Attempt ip geolocation using MaxMind db
-      const geoLocation = geoip.lookup(ipAddress);
+      const geoLocation = lookup(ipAddress);
       if (geoLocation) {  // If the IP address was not found, the lookup returns null
         foundCampaignAnalyticsLink.country = geoLocation.country;
         foundCampaignAnalyticsLink.region = geoLocation.region;

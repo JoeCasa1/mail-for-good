@@ -1,13 +1,13 @@
-const db = require('../../../../../models');
+import { listsubscriber, campaignsubscriber } from '../../../../../models';
 
-const CampaignAnalyticsLink = require('../../../../../models').campaignanalyticslink;
-const CampaignAnalyticsOpen = require('../../../../../models').campaignanalyticsopen;
+import { campaignanalyticslink as CampaignAnalyticsLink } from '../../../../../models';
+import { campaignanalyticsopen as CampaignAnalyticsOpen } from '../../../../../models';
 
-const wrapLink = require('../lib/analytics').wrapLink;
-const insertUnsubscribeLink = require('../lib/analytics').insertUnsubscribeLink;
-const insertTrackingPixel = require('../lib/analytics').insertTrackingPixel;
-const mailMerge = require('../lib/mail-merge');
-const AmazonEmail = require('../lib/amazon');
+import { wrapLink } from '../lib/analytics';
+import { insertUnsubscribeLink } from '../lib/analytics';
+import { insertTrackingPixel } from '../lib/analytics';
+import mailMerge from '../lib/mail-merge';
+import AmazonEmail from '../lib/amazon';
 
 /**
  * @description Get a formatted amazonEmail
@@ -35,13 +35,13 @@ const AmazonEmail = require('../lib/amazon');
  *        [Object] ] } }
  */
 
-module.exports = async function (arrayOfIds, campaignInfo, whiteLabelUrl) {
+export default async function (arrayOfIds, campaignInfo, whiteLabelUrl) {
   const arrayCampaignInfo = arrayOfIds.map(() => Object.assign({}, campaignInfo));
   /**
    * @description Get the list subscriber and join their campaign subscriber information.
    */
   // Get the listsubscriber & join campaignsubscriber
-  const subscribers = await db.listsubscriber.findAll({
+  const subscribers = await listsubscriber.findAll({
     where: {
       id: {
         in: arrayOfIds
@@ -50,7 +50,7 @@ module.exports = async function (arrayOfIds, campaignInfo, whiteLabelUrl) {
     },
     include: [
       {
-        model: db.campaignsubscriber,
+        model: campaignsubscriber,
         required: true,
         where: {
           campaignId: campaignInfo.campaignId

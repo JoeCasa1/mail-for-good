@@ -1,18 +1,14 @@
 require('dotenv').config();
 
-const httpMocks = require('node-mocks-http');
-const test = require('tape');
+import { createResponse } from 'node-mocks-http';
+import test from 'tape';
 const publisher = require("fakeredis").createClient('1');
 const subscriber = require("fakeredis").createClient('1');
 const redis = { publisher, subscriber };
 
-const stopCampaignSending = require('../../../controllers/campaign/stop-campaign-sending');
+import stopCampaignSending from '../../../controllers/campaign/stop-campaign-sending';
 
-const {
-  sequelize,
-  campaign: Campaign,
-  user: User,
-} = require('../../../models');
+import { sequelize, campaign as Campaign, user as User } from '../../../models';
 
 /*
   This test file should be used to test features that require modifications to the postgres test db.
@@ -25,7 +21,7 @@ test('Stop campaign send feature returns the correct status code', async functio
   t.plan(1);
   await beforeEachStopSendCampaign();
 
-  const res = httpMocks.createResponse({ eventEmitter: require('events').EventEmitter });
+  const res = createResponse({ eventEmitter: require('events').EventEmitter });
   const req = {
     user: { id: 1 },
     body: { nope: 1 }
@@ -42,7 +38,7 @@ test('Stop campaign modifies the campaign status appropriately', async function(
   t.plan(1);
   await beforeEachStopSendCampaign();
 
-  const res = httpMocks.createResponse({ eventEmitter: require('events').EventEmitter });
+  const res = createResponse({ eventEmitter: require('events').EventEmitter });
   const req = {
     user: { id: 1 },
     body: { id: 1 }
@@ -61,7 +57,7 @@ test('Stop campaign validates that the campaign belongs to the user', async func
   t.plan(1);
   await beforeEachStopSendCampaign();
 
-  const res = httpMocks.createResponse({ eventEmitter: require('events').EventEmitter });
+  const res = createResponse({ eventEmitter: require('events').EventEmitter });
   const req = {
     user: { id: 1337 },
     body: { id: 1 }

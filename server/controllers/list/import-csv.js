@@ -1,14 +1,14 @@
-const path = require('path');
-const csv = require('csv');
-const fs = require('fs');
-const cargo = require('async/cargo');
-const _ = require('lodash');
-const shortid = require('shortid');
-const emailValidator = require('email-validator');
+import { resolve as _resolve } from 'path';
+import { parse, transform } from 'csv';
+import { createReadStream, unlink } from 'fs';
+import cargo from 'async/cargo';
+import { without, uniqBy, omit } from 'lodash';
+import { generate } from 'shortid';
+import { validate } from 'email-validator';
 
-const db = require('../../models');
-const sendSingleNotification = require('../websockets/send-single-notification');
-const sendUpdateNotification = require('../websockets/send-update-notification');
+import { list, listsubscriber } from '../../models';
+import sendSingleNotification from '../websockets/send-single-notification';
+import sendUpdateNotification from '../websockets/send-update-notification';
 
 // Expects req.body.headers (JSON array), req,body.list (string), req.file (csv file)
 /* Example req.file
@@ -23,7 +23,7 @@ const sendUpdateNotification = require('../websockets/send-update-notification')
     }
 */
 
-module.exports = (req, res, io) => {
+export default (req, res, io) => {
   /*
     Steps in this file
     1. Check if the list (req.body.list) exists. If so, use it. If not, create it.
@@ -32,7 +32,7 @@ module.exports = (req, res, io) => {
   */
 
   const listName = req.body.list; // Name of the list from the user
-  const additionalFields = _.without(JSON.parse(req.body.headers), 'email'); // e.g. name, location, sex, (excluding email header)
+  const additionalFields = without(JSON.parse(req.body.headers), 'email'); // e.g. name, location, sex, (excluding email header)
   const userId = req.user.id;
 
   // Validate the list name. This should also be handled client side so there's no need for a message response.
@@ -41,7 +41,7 @@ module.exports = (req, res, io) => {
     return;
   }
 
-  const validateListBelongsToUser = db.list.findOrCreate({
+  const validateListBelongsToUser = list.findOrCreate({
     where: {
       name: listName,
       userId: userId
@@ -68,10 +68,10 @@ module.exports = (req, res, io) => {
 
     sendSingleNotification(io, req, notification);
     let currentLine = 1; // The current parsed line no.
-    const randomId = shortid.generate();
+    const randomId = generate();
     // Parse the CSV in full & check for any error prior to doing any work
-    const parser = csv.parse({columns: true, skip_empty_lines: true});
-    fs.createReadStream(`${path.resolve(req.file.path)}`)
+    const parser = parse({columns: true, skip_empty_lines: true});
+    createReadStream(`${_resolve(req.file.path)}`)
       .pipe(parser)
       .on('data', () => {
         if (currentLine % 1000 === 0) {
@@ -114,7 +114,7 @@ module.exports = (req, res, io) => {
   Promise.all([validateListBelongsToUser, validateCsvDoesNotContainErrors])
   .then(values => {
     let [listInstance] = values; // Get variables from the values array
-    const randomId = shortid.generate();
+    const randomId = generate();
 
     listInstance = listInstance[0];
     const listIsNew = listInstance.$options.isNewRecord;
@@ -144,10 +144,10 @@ module.exports = (req, res, io) => {
     }
 
     function updateListStatusReady() {
-      db.listsubscriber.count({
+      listsubscriber.count({
         where: { listId: listId }
       }).then(total => {
-        db.list.update(
+        list.update(
           { status: 'ready', total }, { where: { id: listId } }
         ).then(() => {
           console.log('Updated list status to ready'); // eslint-disable-line
@@ -163,7 +163,7 @@ module.exports = (req, res, io) => {
       // Returns unique items in the records array
 
       // First remove duplicate emails from the records
-      records = _.uniqBy(records, 'email');
+      records = uniqBy(records, 'email');
 
       // Now verify that the remaining records do not exist in the db
       const promiseArrayOfUniqueRecords = records.map(row => {
@@ -195,8 +195,8 @@ module.exports = (req, res, io) => {
 
     const c = cargo((tasks, callback) => {
       const tasksLength = tasks.length;
-      returnUniqueItems(db.listsubscriber, tasks).then(uniqueTasks => {
-        db.listsubscriber.bulkCreate(uniqueTasks).then(() => {
+      returnUniqueItems(listsubscriber, tasks).then(uniqueTasks => {
+        listsubscriber.bulkCreate(uniqueTasks).then(() => {
 
           // Track how many emails we've processed so far.
           numberProcessed += tasksLength;
@@ -240,22 +240,22 @@ module.exports = (req, res, io) => {
     }
 
     /* Config csv parser */
-    const parser = csv.parse({columns: true, skip_empty_lines: true}); // Write object with headers as object keys, and skip empty rows
+    const parser = parse({columns: true, skip_empty_lines: true}); // Write object with headers as object keys, and skip empty rows
     const transformerOptions = {
       parallel: bufferLength
     };
     /* ///////////////// */
 
-    const transformer = csv.transform((row, callback) => {
+    const transformer = transform((row, callback) => {
       // If row has no email field (though it should), skip the line. Implicit conversion from both undefined & '' is assumed.
-      if (!row.email || !emailValidator.validate(row.email)) {
+      if (!row.email || !validate(row.email)) {
         callback();
       } else {
         // Add fields to row
         bufferArray.push({
           listId,
           email: row.email,
-          additionalData: _.omit(row, 'email')
+          additionalData: omit(row, 'email')
         });
 
         if (bufferArray.length >= bufferLength) {
@@ -278,11 +278,11 @@ module.exports = (req, res, io) => {
     });
 
     // Create read stream, parse then pipe to transformer to perform async operations. Finally, release data for garbage collection.
-    fs.createReadStream(`${path.resolve(req.file.path)}`).pipe(parser).pipe(transformer).on('data', () => {
+    createReadStream(`${_resolve(req.file.path)}`).pipe(parser).pipe(transformer).on('data', () => {
       // Do nothing with the data. Let it be garbage collected.
     }).on('finish', () => {
       // Delete CSV
-      fs.unlink(`${path.resolve(req.file.path)}`, err => {
+      unlink(`${_resolve(req.file.path)}`, err => {
         if (err)
           throw err;
 

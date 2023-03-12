@@ -1,28 +1,28 @@
-const bodyParser = require('body-parser');
-const parseJson = bodyParser.json();
+import { json } from 'body-parser';
+const parseJson = json();
 const cookieParser = require('cookie-parser')();
 
 // Campaign controllers
-const getCampaigns = require('../controllers/campaign/get-campaigns');
-const createCampaign = require('../controllers/campaign/create-campaign');
-const deleteCampaigns = require('../controllers/campaign/delete-campaigns');
-const exportSentUnsentCSV = require('../controllers/campaign/export-sent-unsent-csv');
-const stopCampaignSending = require('../controllers/campaign/stop-campaign-sending');
-const sendCampaign = require('../controllers/campaign/send-campaign');
-const sendTestEmail = require('../controllers/campaign/email/amazon-ses/send-test');
+import getCampaigns from '../controllers/campaign/get-campaigns';
+import createCampaign from '../controllers/campaign/create-campaign';
+import deleteCampaigns from '../controllers/campaign/delete-campaigns';
+import exportSentUnsentCSV from '../controllers/campaign/export-sent-unsent-csv';
+import stopCampaignSending from '../controllers/campaign/stop-campaign-sending';
+import sendCampaign from '../controllers/campaign/send-campaign';
+import sendTestEmail from '../controllers/campaign/email/amazon-ses/send-test';
 
 // Middleware
-const { apiIsAuth } = require('./middleware/auth');
-const { writeAccess, readAccess } = require('./middleware/acl');
+import { apiIsAuth } from './middleware/auth';
+import { writeAccess, readAccess } from './middleware/acl';
 
 // Permission
-const campaignPermission = require('../controllers/permissions/acl-lib/acl-campaign-permissions');
+import campaignPermission from '../controllers/permissions/acl-lib/acl-campaign-permissions';
 
 // Higher order functions decorating with the permission type
 const writeCampaignAccess = (req, res, next) => writeAccess(req, res, next, campaignPermission);
 const readCampaignAccess = (req, res, next) => readAccess(req, res, next, campaignPermission);
 
-module.exports = function(app, io, redis) {
+export default function(app, io, redis) {
   // Get a list of all campaigns
   app.get('/api/campaign', apiIsAuth, cookieParser, readCampaignAccess, (req, res) => {
     getCampaigns(req, res);

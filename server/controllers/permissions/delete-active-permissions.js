@@ -1,6 +1,6 @@
-const ACL = require('../../models').acl;
+import { acl as ACL } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   let { offerIds } = req.body; // List of ids in acl to delete
   offerIds = typeof offerIds === 'object' ? offerIds : [offerIds];

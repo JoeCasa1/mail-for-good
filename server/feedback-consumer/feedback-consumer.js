@@ -1,15 +1,9 @@
 const debug = require('debug')('server:feedback-consumer:consumer');
-const AWS = require('aws-sdk');
-const Consumer = require('sqs-consumer');
-const {
-  sequelize,
-  setting: Settings,
-  campaignsubscriber: CampaignSubscriber,
-  campaignanalytics: CampaignAnalytics,
-  listsubscriber: ListSubscriber
-} = require('./../models/index');
+import { SQS } from 'aws-sdk';
+import { create } from 'sqs-consumer';
+import { setting as Settings, campaignsubscriber as CampaignSubscriber, campaignanalytics as CampaignAnalytics, listsubscriber as ListSubscriber } from './../models/index';
 
-module.exports = {
+export default {
   start,
   stop,
   restart
@@ -77,11 +71,11 @@ function setupConsumers() {
 
 function createConsumer(region, accessKeyId, secretAccessKey, queueUrl) {
   // Create a consumer that processes email feedback notifications from an SQS queue
-  return Consumer.create({
+  return create({
     queueUrl,
     batchSize: 10,
     handleMessage: receiveMessageCallback,
-    sqs: new AWS.SQS({ accessKeyId, secretAccessKey, region })
+    sqs: new SQS({ accessKeyId, secretAccessKey, region })
   });
 }
 

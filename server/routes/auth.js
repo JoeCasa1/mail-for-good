@@ -1,7 +1,7 @@
-const path = require('path');
-const bodyParser = require('body-parser');
+import { resolve } from 'path';
+import { urlencoded } from 'body-parser';
 
-module.exports = (app, passport) => {
+export default (app, passport) => {
   app.get('/login', (req, res) => {
     let strategies = {
       local:true,
@@ -10,7 +10,7 @@ module.exports = (app, passport) => {
     if(process.env.GOOGLE_CONSUMER_KEY !== undefined){
       strategies.google = true
     }
-    res.render(path.resolve('public/index.pug'), {strategies});
+    res.render(resolve('public/index.pug'), {strategies});
   });
 
   // Redirect user to Google for authentication. When complete, Google will return the user to /auth/google/return
@@ -25,7 +25,7 @@ module.exports = (app, passport) => {
     failureRedirect: '/login'
   }));
 
-  app.post('/auth/local/login',bodyParser.urlencoded({extended:true}), function(req,res,next){
+  app.post('/auth/local/login',urlencoded({extended:true}), function(req,res,next){
     passport.authenticate('local-login',function(err,user,info){
       if(err){
         res.status(401).json({error:err})

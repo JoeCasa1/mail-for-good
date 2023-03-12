@@ -1,6 +1,6 @@
-const List = require('../../models').list;
+import { list as List } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   const listId = req.body.id;
   const values = req.body.values;

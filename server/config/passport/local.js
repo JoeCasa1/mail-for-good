@@ -1,7 +1,7 @@
-const LocalStrategy  = require('passport-local').Strategy;
-const db = require('../../models');
+import { Strategy as LocalStrategy } from 'passport-local';
+import { user as _user } from '../../models';
 
-module.exports = (passport) => {
+export default (passport) => {
   passport.use('local-login',new LocalStrategy(strategyOptions ,authenticationProcess))
 };
 
@@ -11,7 +11,7 @@ const strategyOptions = {
 }
 
 const authenticationProcess = (email,password,done) => {
-  db.user.findOne({
+  _user.findOne({
     where: {
       email: email
     }
@@ -19,7 +19,7 @@ const authenticationProcess = (email,password,done) => {
     if(user === null){
       done('No account found',false)
     }else{
-      db.user.checkPassword(password,user.password)
+      _user.checkPassword(password,user.password)
       .then((isValid) => {
         if(isValid === true){
           done(null,user)

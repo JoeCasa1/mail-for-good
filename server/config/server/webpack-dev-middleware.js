@@ -1,12 +1,12 @@
-const webpack = require('webpack');
-const history = require('connect-history-api-fallback');
+import webpack from 'webpack';
+import history from 'connect-history-api-fallback';
 
 /*
   With thanks to https://github.com/coryhouse/react-slingshot
   This app was kickstarted with this generator.
 */
 
-module.exports = app => {
+export default app => {
   if (process.env.NODE_ENV === 'development') {
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const webpackHotMiddleware = require('webpack-hot-middleware');

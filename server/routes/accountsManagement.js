@@ -1,13 +1,13 @@
-const bodyParser = require('body-parser');
-const parseJson = bodyParser.json();
+import { json } from 'body-parser';
+const parseJson = json();
 
-const createUser = require('../controllers/accountsManagement/create-user');
-const deleteUser = require('../controllers/accountsManagement/delete-user');
+import createUser from '../controllers/accountsManagement/create-user';
+import deleteUser from '../controllers/accountsManagement/delete-user';
 
 // Middleware
-const { apiIsAuth } = require('./middleware/auth');
+import { apiIsAuth } from './middleware/auth';
 
-module.exports = function(app) {
+export default function(app) {
   app.post('/api/create-user', apiIsAuth, parseJson, (req, res) => {
     createUser(req,res);
   })

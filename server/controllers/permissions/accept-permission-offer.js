@@ -1,8 +1,8 @@
-const sequelize = require('../../models').sequelize;
-const OfferPermission = require('../../models').offerPermission;
-const ACL = require('../../models').acl;
+import { sequelize } from '../../models';
+import { offerPermission as OfferPermission } from '../../models';
+import { acl as ACL } from '../../models';
 
-module.exports = function(req, res) {
+export default function(req, res) {
 
   let { offerIds } = req.body.data; // List of ids in offerPermission to accept
   offerIds = typeof offerIds === 'object' ? offerIds : [offerIds];

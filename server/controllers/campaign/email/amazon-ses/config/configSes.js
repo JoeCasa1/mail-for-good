@@ -5,14 +5,14 @@
  * @return {string} HTML with {{variables}} replaced by what they represent. E.g., {{cat}} may become 'Garfield'
  */
 
-const AWS = require('aws-sdk');
+import { SES } from 'aws-sdk';
 
-module.exports = (accessKey, secretKey, region) => {
+export default (accessKey, secretKey, region) => {
   const isProductionTestMode = process.env.TEST_PRODUCTION === 'true';
   const isDevMode = process.env.NODE_ENV === 'development' || isProductionTestMode;
 
   const ses = (isDevMode || isProductionTestMode)
-    ? new AWS.SES({  // Dev mode
+    ? new SES({  // Dev mode
         apiVersion: '2010-12-01',
         // convertResponseTypes: false,
         accessKeyId: accessKey,
@@ -21,7 +21,7 @@ module.exports = (accessKey, secretKey, region) => {
         region,
         endpoint: 'http://localhost:9999'
       })
-    : new AWS.SES({ // Prod mode
+    : new SES({ // Prod mode
         apiVersion: '2010-12-01',
         accessKeyId: accessKey,
         secretAccessKey: secretKey,

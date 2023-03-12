@@ -1,10 +1,6 @@
-const {
-  // sequelize,
-  campaign: Campaign
-} = require('../../models');
+import { campaign as Campaign } from '../../models';
 
-
-module.exports = (req, res, redis) => {
+export default (req, res, redis) => {
 
   // If req.body.id was not supplied or is not a number, cancel
   if (!req.body.id || typeof req.body.id !== 'number') {

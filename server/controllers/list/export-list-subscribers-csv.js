@@ -1,7 +1,7 @@
-const List = require('../../models').list;
-const ListSubscriber = require('../../models').listsubscriber;
+import { list as List } from '../../models';
+import { listsubscriber as ListSubscriber } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
   // Find all subscribers belonging to a list
 
   const filters = JSON.parse(req.query.filters) || {};

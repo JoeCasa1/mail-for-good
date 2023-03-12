@@ -1,18 +1,11 @@
 require('dotenv').config();
 
-const httpMocks = require('node-mocks-http');
-const test = require('tape');
+import { createResponse } from 'node-mocks-http';
+import test from 'tape';
 
-const exportSentUnsentCsv = require('../../../controllers/campaign/export-sent-unsent-csv');
+import exportSentUnsentCsv from '../../../controllers/campaign/export-sent-unsent-csv';
 
-const {
-  sequelize,
-  campaignsubscriber: CampaignSubscriber,
-  campaign: Campaign,
-  user: User,
-  list: List,
-  listsubscriber: ListSubscriber
-} = require('../../../models');
+import { sequelize, campaignsubscriber as CampaignSubscriber, campaign as Campaign, user as User, list as List, listsubscriber as ListSubscriber } from '../../../models';
 
 /*
   This test file should be used to test features that require modifications to the postgres test db.
@@ -54,7 +47,7 @@ test('Test export sent/unsent CSV function', async function (t) {
     query: { campaignId: campaign.id, sent: false }
   };
 
-  const response = httpMocks.createResponse();
+  const response = createResponse();
   exportSentUnsentCsv(request, response);
   t.equal(200, response.statusCode, 'Export sent/unsent CSV returns status code 200');
 });

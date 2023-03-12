@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+export default function(sequelize, DataTypes) {
   var campaign = sequelize.define('campaign', {
     name: DataTypes.STRING,
     fromName: DataTypes.STRING,

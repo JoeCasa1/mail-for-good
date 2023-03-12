@@ -1,7 +1,7 @@
-const List = require('../../models').list;
-const ListSubscriber = require('../../models').listsubscriber;
+import { list as List } from '../../models';
+import { listsubscriber as ListSubscriber } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
 
   const userId = req.user.id;
   const listIds = req.body.lists;

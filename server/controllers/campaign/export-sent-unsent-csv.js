@@ -1,7 +1,7 @@
-const Campaign = require('../../models').campaign;
-const CampaignSubscriber = require('../../models').campaignsubscriber;
+import { campaign as Campaign } from '../../models';
+import { campaignsubscriber as CampaignSubscriber } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
   const userId = req.user.id;
   const campaignId = req.query.campaignId;
   const sent = req.query.sent;   // TODO: improve validation - should be false or true

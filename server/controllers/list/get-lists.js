@@ -1,6 +1,6 @@
-const list = require('../../models').list;
+import { list } from '../../models';
 
-module.exports = (req, res) => {
+export default (req, res) => {
   // Find all lists belonging to a user & send it to them
   let userId = req.user.id;
 

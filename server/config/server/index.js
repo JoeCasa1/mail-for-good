@@ -1,22 +1,21 @@
-const http = require('http');
-const path = require('path');
-const express = require('express');
-const passport = require('passport');
-const helmet = require('helmet');
-const cookieSession = require('cookie-session');
-const configureSequelize = require('./sequelize');
-const configureWebpackDevMiddleware = require('./webpack-dev-middleware');
-const configureRedis = require('./redis');
-const configureSession = require('./session');
-const configureIo = require('./io');
+import { Server } from 'http';
+import express from 'express';
+import passport, { initialize, session } from 'passport';
+import helmet from 'helmet';
+import cookieSession from 'cookie-session';
+import configureSequelize from './sequelize';
+import configureWebpackDevMiddleware from './webpack-dev-middleware';
+import configureRedis from './redis';
+import configureSession from './session';
+import configureIo from './io';
 
-const restoreDbState = require('./restore-db-state');
-const routes = require('../../routes');
+import restoreDbState from './restore-db-state';
+import routes from '../../routes';
 
 const app = express();
-const server = http.Server(app);
+const server = Server(app);
 
-module.exports = () => {
+export default () => {
   // Sync the db
   configureSequelize();
   // Use webpack deb middleware in development mode
@@ -32,21 +31,22 @@ module.exports = () => {
   const io = configureIo(sessionMiddleware, server);
 
   // Configure express & passport
-  require('./passport')(passport); // Configure passport strategies & serialisation
+  // Configure express & passport
+  require("./passport").default(passport); // Configure passport strategies & serialisation
   app.use(sessionMiddleware); // Use redis as session state handler
-  app.use(passport.initialize()); // Initialise passport
-  app.use(passport.session()); // Use passport middleware for auth
+  app.use(initialize()); // Initialise passport
+  app.use(session()); // Use passport middleware for auth
   app.use(helmet()); // Implements various security tweaks to http response headers
 
   app.use(
     cookieSession({
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      keys: [process.env.COOKIE_SESSION]
+      keys: [process.env.COOKIE_SESSION],
     })
   );
 
-  app.use('/public', express.static(path.join(__dirname, '../../../public'))); // Serve /public static files when unauth
-  app.use('/dist', express.static(path.join(__dirname, '../../../dist'))); // Serve /dist static diles when auth
+  app.use("/public", express.static(path.join(__dirname, "../../../public"))); // Serve /public static files when unauth
+  app.use("/dist", express.static(path.join(__dirname, "../../../dist"))); // Serve /dist static diles when auth
 
   // Routes
   routes(app, passport, io, { client, subscriber, publisher });
